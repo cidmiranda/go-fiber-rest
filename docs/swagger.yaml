@@ -1,362 +1,254 @@
-basePath: /v1
 definitions:
-  http.authResponse:
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  model.Login:
+    description: Login Object
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  model.Message:
+    description: Message Object
+    properties:
+      message:
+        description: message
+        type: string
+      status:
+        description: status
+        type: string
+    type: object
+  model.Token:
+    description: Token Object
     properties:
       token:
-        example: v2.local.Gdh5kiOTyyaQ3_bNykYDeYHO21Jg2...
+        description: token
         type: string
     type: object
-  http.errorResponse:
+  model.User:
+    description: User Object
     properties:
-      messages:
-        example:
-        - Error message 1
-        - ' Error message 2'
-        items:
-          type: string
-        type: array
-      success:
-        example: false
-        type: boolean
-    type: object
-  http.loginRequest:
-    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
       email:
-        example: test@example.com
-        type: string
-      password:
-        example: "12345678"
-        minLength: 8
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  http.meta:
-    properties:
-      limit:
-        example: 10
-        type: integer
-      skip:
-        example: 0
-        type: integer
-      total:
-        example: 100
-        type: integer
-    type: object
-  http.registerRequest:
-    properties:
-      email:
-        example: test@example.com
-        type: string
-      name:
-        example: John Doe
-        type: string
-      password:
-        example: "12345678"
-        minLength: 8
-        type: string
-    required:
-    - email
-    - name
-    - password
-    type: object
-  http.response:
-    properties:
-      data: {}
-      message:
-        example: Success
-        type: string
-      success:
-        example: true
-        type: boolean
-    type: object
-  http.updateUserRequest:
-    properties:
-      email:
-        example: test@example.com
-        type: string
-      name:
-        example: John Doe
-        type: string
-      password:
-        example: "12345678"
-        minLength: 8
-        type: string
-    required:
-    - email
-    - name
-    - password
-    type: object
-  http.userResponse:
-    properties:
-      created_at:
-        example: "1970-01-01T00:00:00Z"
-        type: string
-      email:
-        example: test@example.com
         type: string
       id:
-        example: 1
-        type: integer
-      name:
-        example: John Doe
         type: string
-      updated_at:
-        example: "1970-01-01T00:00:00Z"
+      password:
+        type: string
+      updatedAt:
+        type: string
+      username:
         type: string
     type: object
-host: localhost:8080
+  model.Users:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+    type: object
 info:
   contact: {}
-  description: This is a simple RESTful Service API written in Go using Gin web framework,
-    PostgreSQL database, and Redis cache.
-  title: Go API
+  description: API desenvolvida em Go, com fiber, postgres e gorm
+  title: GO Fiber API
   version: "1.0"
 paths:
-  /users:
-    get:
-      consumes:
-      - application/json
-      description: List users with pagination
-      parameters:
-      - description: Skip
-        in: query
-        name: skip
-        required: true
-        type: integer
-      - description: Limit
-        in: query
-        name: limit
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Users displayed
-          schema:
-            $ref: '#/definitions/http.meta'
-        "400":
-          description: Validation error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-      security:
-      - BearerAuth: []
-      summary: List users
-      tags:
-      - Users
+  /api/auth:
     post:
       consumes:
       - application/json
-      description: create a new user account with default role "cashier"
+      description: Login User by username and password
       parameters:
-      - description: Register request
-        in: body
-        name: registerRequest
-        required: true
-        schema:
-          $ref: '#/definitions/http.registerRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User created
-          schema:
-            $ref: '#/definitions/http.userResponse'
-        "400":
-          description: Validation error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "401":
-          description: Unauthorized error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "404":
-          description: Data not found error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "409":
-          description: Data conflict error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-      summary: Register a new user
-      tags:
-      - Users
-  /users/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete a user by id
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User deleted
-          schema:
-            $ref: '#/definitions/http.response'
-        "400":
-          description: Validation error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "401":
-          description: Unauthorized error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "403":
-          description: Forbidden error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "404":
-          description: Data not found error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-      security:
-      - BearerAuth: []
-      summary: Delete a user
-      tags:
-      - Users
-    get:
-      consumes:
-      - application/json
-      description: Get a user by id
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User displayed
-          schema:
-            $ref: '#/definitions/http.userResponse'
-        "400":
-          description: Validation error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "404":
-          description: Data not found error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-      security:
-      - BearerAuth: []
-      summary: Get a user
-      tags:
-      - Users
-    put:
-      consumes:
-      - application/json
-      description: Update a user's name, email, password, or role by id
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Update user request
-        in: body
-        name: updateUserRequest
-        required: true
-        schema:
-          $ref: '#/definitions/http.updateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User updated
-          schema:
-            $ref: '#/definitions/http.userResponse'
-        "400":
-          description: Validation error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "401":
-          description: Unauthorized error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "403":
-          description: Forbidden error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "404":
-          description: Data not found error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-      security:
-      - BearerAuth: []
-      summary: Update a user
-      tags:
-      - Users
-  /users/login:
-    post:
-      consumes:
-      - application/json
-      description: Logs in a registered user and returns an access token if the credentials
-        are valid.
-      parameters:
-      - description: Login request body
+      - description: Request of Login User Object
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/http.loginRequest'
+          $ref: '#/definitions/model.Login'
       produces:
       - application/json
       responses:
         "200":
-          description: Succesfully logged in
+          description: OK
           schema:
-            $ref: '#/definitions/http.authResponse'
+            $ref: '#/definitions/model.Token'
         "400":
-          description: Validation error
+          description: 'Error: Bad Requestt'
           schema:
-            $ref: '#/definitions/http.errorResponse'
+            $ref: '#/definitions/model.Message'
         "401":
-          description: Unauthorized error
+          description: 'Error: Unauthorized'
           schema:
-            $ref: '#/definitions/http.errorResponse'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/http.errorResponse'
-      summary: Login and get an access token
+            $ref: '#/definitions/model.Message'
+      summary: Login User by username and password
       tags:
-      - Users
-schemes:
-- http
-- https
+      - Auth
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: Get All Users from db
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Users'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/model.Message'
+        "500":
+          description: 'Error: Bad Requestt'
+          schema:
+            $ref: '#/definitions/model.Message'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Users from db
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Create a new User
+      parameters:
+      - description: Request of User Object
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/model.Message'
+        "500":
+          description: 'Error: Bad Requestt'
+          schema:
+            $ref: '#/definitions/model.Message'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new User
+      tags:
+      - User
+  /api/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a User from db
+      parameters:
+      - description: id of User Object
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/model.Message'
+        "500":
+          description: 'Error: Bad Requestt'
+          schema:
+            $ref: '#/definitions/model.Message'
+      security:
+      - ApiKeyAuth: []
+      summary: Get a User from db
+      tags:
+      - User
+  /api/user{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user in db by ID
+      parameters:
+      - description: id of User Object
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Message'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/model.Message'
+        "500":
+          description: 'Error: Bad Requestt'
+          schema:
+            $ref: '#/definitions/model.Message'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user in db by ID
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update a User in bd
+      parameters:
+      - description: Request of User Object
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      - description: id of User Object
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: 'Error: Unauthorized'
+          schema:
+            $ref: '#/definitions/model.Message'
+        "500":
+          description: 'Error: Bad Requestt'
+          schema:
+            $ref: '#/definitions/model.Message'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a User in db
+      tags:
+      - User
 securityDefinitions:
-  BearerAuth:
-    description: Type "Bearer" followed by a space and the access token.
+  ApiKeyAuth:
     in: header
     name: Authorization
     type: apiKey

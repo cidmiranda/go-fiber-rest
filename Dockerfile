@@ -1,19 +1,22 @@
-# build stage
-FROM golang:1.24 AS build
+# syntax=docker/dockerfile:1
 
-# set working directory
+# Specifies a parent image
+FROM golang:1.24
+ 
+# Creates an app directory to hold your app’s source code
 WORKDIR /app
-
-# copy source code
+ 
+# Copies everything from your root directory into /app
 COPY . .
-
-# install dependencies
+ 
+# Installs Go dependencies
 RUN go mod download
-
-# build binary
-RUN go build -o ./gows ./cmd/http/main.go
-# CGO_ENABLED=0 GOOS=linux GOARCH=amd64 
-
+ 
+# Builds your app with optional configuration
+RUN go build -o /go-fiber-ws
+ 
+# Tells Docker which network port your container listens on
 EXPOSE 8080
-
-ENTRYPOINT [ "./gows" ]
+ 
+# Specifies the executable command that runs when the container starts
+CMD [ "/go-fiber-ws" ]
